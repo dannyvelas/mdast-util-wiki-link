@@ -108,6 +108,8 @@ let ast = fromMarkdown('[[Test Page]]', {
 #### `toMarkdown`
 
 * `options.aliasDivider [String]`: a string to be used as the divider for aliases. See the section below on [Aliasing pages](#aliasing-pages). Defaults to `":"`.
+* `options.convertToLink [Boolean]`: if this is set to `true`, then the generated markdown will have markdown links in place of wiki links. In other words, a wiki link that looks like this: `[[Real Page:Page Alias]]`, will be converted to a markdown link like this: `[Page Alias](#/page/real_page)`.
+* `options.removeLinkIfNotExists [Boolean]`: if this is set to `true`, then all wiki links, which have a target that does not exist in `options.permalinks`, will be converted to plain text. In other words, if `options.permalinks` looks like this: `["real_page"]`, then a wiki link that looks like this: `[[Real Page: Page Alias]]`, will remain as-is in the generated markdown. However, a wiki link that look like this: `[[Non existing page: Page Alias]]`, will be converted to the text `Page Alias` in the generated markdown. This option can be used alongside the `convertToLink` option.
 
 ### Aliasing pages
 

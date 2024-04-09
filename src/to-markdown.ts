@@ -2,10 +2,14 @@ import safe from 'mdast-util-to-markdown/lib/util/safe'
 
 interface ToMarkdownOptions {
   aliasDivider?: string;
+  convertToLink?: boolean;
+  removeLinkIfNotExists?: boolean;
 }
 
 function toMarkdown (opts: ToMarkdownOptions = {}) {
   const aliasDivider = opts.aliasDivider || ':'
+  const convertToLink = !!opts.convertToLink
+  const removeLinkIfNotExists = !!opts.removeLinkIfNotExists
 
   const unsafe = [
     {
@@ -25,10 +29,12 @@ function toMarkdown (opts: ToMarkdownOptions = {}) {
     const nodeAlias = safe(context, node.data.alias, { before: '[', after: ']' })
 
     let value
-    if (nodeAlias !== nodeValue) {
-      value = `[[${nodeValue}${aliasDivider}${nodeAlias}]]`
+    if (removeLinkIfNotExists && !node.data.exists) {
+      value = nodeAlias
+    } else if (convertToLink) {
+      value = `[${nodeAlias}](${node.data.hProperties.href})`
     } else {
-      value = `[[${nodeValue}]]`
+      value = generateWikiLink(nodeValue, nodeAlias, aliasDivider)
     }
 
     exit()
@@ -41,6 +47,18 @@ function toMarkdown (opts: ToMarkdownOptions = {}) {
     handlers: {
       wikiLink: handler
     }
+  }
+}
+
+function generateWikiLink(
+  nodeValue: string,
+  nodeAlias: string,
+  aliasDivider: string
+): string {
+  if (nodeAlias !== nodeValue) {
+    return `[[${nodeValue}${aliasDivider}${nodeAlias}]]`
+  } else {
+    return `[[${nodeValue}]]`
   }
 }
 
